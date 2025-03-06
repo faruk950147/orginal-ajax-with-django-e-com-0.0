@@ -37,43 +37,66 @@ class HomeView(generic.View):
 
 
 def SingleProductView(request, id):
+    # Retrieve the product by id or return a 404 error if not found
     product = get_object_or_404(Product, id=id)
-    related_products = Product.objects.filter(category=product.category).exclude(id=id).select_related('category').order_by('-id')[:4]
+    
+    # Retrieve related products:
+    related_products = Product.objects.filter(
+        category=product.category
+    ).exclude(
+        id=id
+    ).select_related(
+        'category'
+    ).order_by('-id')[:4]
+    
+    # Retrieve active reviews for the product:
     reviews = Review.objects.filter(product=product, status=True).select_related('user')
     reviews_total = reviews.count()
 
+    # Build the initial context dictionary.
     context = {
         'product': product,
         'related_products': related_products,
         'reviews': reviews,
         'reviews_total': reviews_total,
-        # default variant no need to select
-        'variant': None,
+        'variant': None,  # Default variant, none selected yet.
     }
 
-    # query = request.GET.get('q', '')
-    #check have variant in product
+    # Check if the product has variants.
     if product.variant != 'None':
-        # default variant no need to select
         variant = None
+        
         if request.method == "POST":
+            # Attempt to retrieve the selected variant using 'colorid' from the form.
             color_id = request.POST.get('colorid')
-            #selected product by click color radio
-            variant = Variants.objects.get(id=color_id) 
-            colors = Variants.objects.filter(product_id=id,size_id=variant.size_id) if variant else []
-            sizes = Variants.objects.raw('SELECT * FROM  stories_variants  WHERE product_id=%s GROUP BY size_id',[id]) if variant else []
-            # query += f" {variant.title} Size: {variant.size} Color: {variant.color}" if variant else ""
+            variant = get_object_or_404(Variants, id=color_id)
+            colors = Variants.objects.filter(product_id=id, size_id=variant.size_id) if variant else []
+            sizes = Variants.objects.raw(
+                'SELECT * FROM stories_variants WHERE product_id=%s GROUP BY size_id', [id]
+            ) if variant else []
         else:
-            variants = Variants.objects.filter(product_id=id)
-            colors = Variants.objects.filter(product_id=id,size_id=variants[0].size_id ) if variants else []
-            sizes = Variants.objects.raw('SELECT * FROM stories_variants  WHERE product_id=%s GROUP BY size_id',[id]) if variants.exists() else []
-            variant =Variants.objects.get(id=variants[0].id)
+            # Retrieve all variants for the product.
+            variants = list(Variants.objects.filter(product_id=id))
+            
+            # Check if any variants exist before trying to access the first one.
+            if variants:
+                # Set colors to variants that share the same size_id as the first variant.
+                colors = Variants.objects.filter(product_id=id, size_id=variants[0].size_id)
+                sizes = Variants.objects.raw(
+                    'SELECT * FROM stories_variants WHERE product_id=%s GROUP BY size_id', [id]
+                )
+                variant = variants[0]
+            else:
+                # If no variants exist, fallback to empty lists and None.
+                colors = []
+                sizes = []
+                variant = None
 
+        # Update the context with variant-related information.
         context.update({
             'sizes': sizes,
             'colors': colors,
             'variant': variant,
-            # 'query': query,
         })
 
     return render(request, 'stories/single.html', context)
