@@ -89,7 +89,7 @@
 							<p>{{product.keyword|title}}</p>
 
 							<div class="product-btns">
-								<div class="row">
+								<div class=" ml-5">
 									{% if product.variant == 'Sizes-Colors' %}
 										<div class="product-options">
 											<div class="size-option">
@@ -110,7 +110,6 @@
 											<form method="post" id="post-color">
 												<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 												<div id="appendHere">
-													<input type="hidden" name="size" id="size" value="{{ size_id }}">
 													<ul class="color-option">
 														<li><span class="text-uppercase">Color:</span></li>
 														{% for color in colors %}
@@ -133,7 +132,6 @@
 										<form method="post" id="post-color">
 											<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 											<div id="appendHere">
-												<input type="hidden" name="size" id="size" value="{{ size_id }}">
 												<ul class="color-option">
 													<li><span class="text-uppercase">Size:</span></li>
 								
@@ -154,7 +152,6 @@
 										<form method="post" id="post-color">
 											<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 											<div id="appendHere">
-												<input type="hidden" name="size" id="size" value="{{ size_id }}">
 												<ul class="color-option">
 													<li><span class="text-uppercase">Color:</span></li>
 													{% for color in colors %}
