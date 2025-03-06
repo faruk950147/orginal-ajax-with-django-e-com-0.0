@@ -1,0 +1,176 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Single product{% endblock title %} 
+{% block main %}
+	<!-- BREADCRUMB -->
+	<div id="breadcrumb">
+		<div class="container">
+			<ul class="breadcrumb">
+				<li><a href="#">Home</a></li>
+				<li><a href="#">Products</a></li>
+				<li><a href="#">Category</a></li>
+				<li class="active">Product Name Goes Here</li>
+			</ul>
+		</div>
+	</div>
+	<!-- /BREADCRUMB -->
+	{% include "components/detail.html" %}
+	{% include "components/related.html" %}
+
+	
+{% endblock main %}
+
+{% block extra_scripts %}
+	<script>
+		$(document).ready(function () {
+
+			function renderStars(rate) {
+				let stars = "";
+				for (let i = 1; i <= 5; i++) {
+					stars += `<i class="fa ${i <= rate ? 'fa-star' : 'fa-star-o'}"></i>`;
+				}
+				return stars;
+			}
+			// Handle form submission
+			$("#sendReview").click(function (e) {
+				e.preventDefault();
+				let review_id = $("#reviewForm #review_id").val();  // Check if editing
+				let product_id = $("#reviewForm #product_id").val();  // Get product ID
+				let subject = $('#reviewForm #id_subject').val();
+				let comment = $('#reviewForm #id_comment').val();
+				let rate = $('#reviewForm input[name="rate"]:checked').val(); // Ensure selected value is captured
+				let csrfmiddlewaretoken = $('#reviewForm input[name=csrfmiddlewaretoken]').val();
+				// Ensure productId is not empty
+				if (!review_id && !product_id) {
+					alertify.error("Review ID and Product ID is missing!");
+					return;
+				}
+				// Ensure subject, comment, and rate are not empty
+				if (subject.length > 0 && comment.length > 0 && rate != null) {		
+					$.ajax({
+						url: '{% url "reviewsview" %}',
+						method: "POST",
+						headers: {
+							"X-CSRFToken": csrfmiddlewaretoken  // CSRF token passing
+						},
+						contentType: "application/json",
+						data: JSON.stringify({review_id: review_id, product_id: product_id, subject: subject, comment: comment, rate: rate}),
+						dataType: "json",
+						success: function (res) {
+							if(res.status == 200){
+								let reviewDiv = $("#review-" + res.review_id);
+								if (reviewDiv.length) {
+									// If editing, update existing review
+									reviewDiv.find(".review-subject").text(res.subject);
+									reviewDiv.find(".review-comment").text(res.comment);
+									reviewDiv.find(".review-rating").html(renderStars(res.rate)); // ✅ Update stars dynamically
+								} else {
+									// If new review, append it
+									$(".product-reviews").prepend(`
+										<div class="single-review" id="review-${res.review_id}">
+											<div class="review-heading">
+												<div><i class="fa fa-user-o"></i> ${res.user}</div>
+												<div><i class="fa fa-clock-o"></i> ${res.updated_date}</div>
+												<div class="edit_review" style="float: inline-end;">
+													<button type="button" class="btn btn-sm primary-btn edit-review"
+														data-id="${res.review_id}" data-subject="${res.subject}"
+														data-comment="${res.comment}" data-rate="${res.rate}">
+														<i class="fa-regular fa-pen-to-square"></i>
+													</button>
+												</div>
+												<div class="review-rating pull-right">
+													${renderStars(res.rate)} <!-- ✅ Updated properly -->
+												</div>
+											</div>
+											<div class="review-body">
+												<p class="review-subject">${res.subject}</p>
+												<p class="review-comment">${res.comment}</p>
+											</div>
+										</div>
+									`);
+								} 
+								// ✅ Clear form fields
+								// Optionally clear the form after submission
+								$('#reviewForm')[0].reset();
+								$('.reviews_total_avg').load(location.href + ' .reviews_total_avg');
+								$('.review_count').load(location.href + ' .review_count');
+								$('.reviews_total').load(location.href + ' .reviews_total');
+								alertify.success(res.messages)
+							}
+							else if(res.status == 400){
+								alertify.error(res.messages)
+							}
+							else if(res.status == 400){
+								alertify.error(res.messages)
+							}
+						},
+					});
+				}
+				// Ensure subject, comment, and rate are not empty
+				if (subject == "") {
+					alertify.error("Subject is empty!");
+				}
+				if (comment == "") {
+					alertify.error("Comment is empty!");
+				}
+				if (rate == null) {
+					alertify.error("Rate is empty!");
+				}
+
+			});
+		
+			$(document).on("click", ".edit-review", function () {
+				let review_id = $(this).data("id");
+				let subject = $(this).data("subject");
+				let comment = $(this).data("comment");
+				let rate = $(this).data("rate"); // Get the stored rating
+
+				$("#review_id").val(review_id);
+				$("#id_subject").val(subject);
+				$("#id_comment").val(comment);
+
+				// Clear any existing selection first
+				$("input[name='rate']").prop("checked", false);
+
+				// Select the correct rating based on the review
+				$(`input[name='rate'][value='${rate}']`).prop("checked", true);
+			});
+
+			$(document).on('change', '#sizeid', function(e){
+				e.preventDefault();
+			
+				let productid = $('#productid').val();
+				let size = $('#sizeid').val();
+
+				if(!productid){
+					alertify.error("Product id not found");
+					return;
+				}
+
+				// validation
+				if (!size) {  
+					alertify.error("Please select a size first!");  
+					return;  
+				}	
+				$.ajax({
+					method: 'POST',
+					url: '{% url "ajax_variant_select" %}',
+					data: {
+						productid: productid,
+						size: size,
+						csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+						action: 'post'
+					},
+					dataType: 'json',
+					success: function (data) {
+						$('#appendHere').html(data.rendered_table);
+					},
+					error: function (xhr, status, error) {
+						alertify.error("Error: " + xhr.responseText);
+					}
+				});
+			});
+			
+		});
+	</script>
+{% endblock extra_scripts %}	

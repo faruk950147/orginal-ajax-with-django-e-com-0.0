@@ -1,0 +1,45 @@
+{% load static %}
+	<!-- HOME -->
+	<div id="home">
+		<!-- container -->
+		<div class="container">
+			<!-- home wrap -->
+			<div class="home-wrap">
+				<!-- home slick -->
+				<div id="home-slick">
+					{% if sliders %}
+					{% for slider in sliders %}
+					<!-- banner -->
+					<div class="banner banner-1">
+						{% if slider.image %}
+						<img src="{{slider.image.url}}" alt="">
+						{% else %}
+						    <img src="{% static "img/no-image.jpg" %}" alt="">
+						{% endif %}
+						<div class="banner-caption text-center">
+							<h3 class="white-color">{{slider.title|title|truncatewords:5}}</h3>
+							{% if slider.product.discount %}
+							<h3 class="white-color font-weak">Off - {{slider.product.discount}}% </h3>
+							{% endif %}
+							<h3 class="white-color">{{slider.product.title|title}}</h3>
+							<h3 class="product-price white-color"> 	
+								{% if slider.product.price %}									
+								& {{slider.product.price|title}} 
+								{% else %}
+								<del class="product-old-price">$ {{slider.product.old_price|title}}</del>									
+								{% endif %}
+							</h3>
+							<button class="primary-btn">Shop Now</button>
+						</div>
+					</div>
+					<!-- /banner -->
+					{% endfor %}
+					{% endif %}
+				</div>
+				<!-- /home slick -->
+			</div>
+			<!-- /home wrap -->
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /HOME -->

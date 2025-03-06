@@ -1,0 +1,186 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Cart{% endblock title %} 
+{% block main %}
+	<!-- section -->
+	<div class="section">
+		<!-- container -->
+		<div class="container">
+			<!-- row -->
+			<div class="row">
+				<div class="clearfix" style="margin-top: 30px;">
+					<div class="col-md-12">
+						<div class="order-summary clearfix">
+							<div class="section-title text-center">
+								<h3 class="title text-center">Carts Review</h3>
+							</div>
+							<table class="shopping-cart-table table">
+								<thead>
+									<tr>
+										<th>Product</th>
+										<th></th>
+										<th class="text-center">Price</th>
+										<th class="text-center">Quantity</th>
+										<th class="text-center">Total</th>
+										<th class="text-right">Remove</th>
+									</tr>
+								</thead>
+								<tbody>
+									{% for cart_products in cart_products %}
+									<tr>
+										<td class="thumb">
+											{% if cart_products.product.image %}
+											<img src="{{cart_products.product.image.url}}" alt="">
+											{% elif cart_products.product.products_images.first.image %}
+											<img src="{{cart_products.product.products_images.first.image.url}}" alt="">
+											{% else %}
+											<img src="{% static "img/no-image.jpg" %}" alt="">
+											{% endif %}
+										</td>
+										<td class="details">
+											<a href="#">{{cart_products.product.title}}</a>
+											<ul>
+												<li><span>Size: XL</span></li>
+												<li><span>Color: Camelot</span></li>
+											</ul>
+										</td>
+										<td class="price text-center">
+											<strong>$ {{cart_products.product.price}}</strong>
+											<br>
+											{% if cart_products.product.old_price %}
+											<del class="font-weak"><small>$ {{cart_products.product.old_price}}</small></del>
+											{% endif %}
+										</td>
+										<td class="qty text-center">
+											<button class="btn btn-sm btn-outline-secondary decrease-qty" data-id="{{ cart_products.id }}">-</button>
+											<span class="quantity" data-id="{{ cart_products.id }}"> {{ cart_products.quantity }} </span>
+											<button class="btn btn-sm btn-outline-secondary increase-qty" data-id="{{ cart_products.id }}">+</button>
+										</td>
+
+										<td class="total text-center">
+											<strong class="primary-color" data-id="{{ cart_products.id }}">
+												$ {{ cart_products.qty_total_price }}
+											</strong>
+										</td>
+										
+										<!-- Remove Item Button -->
+										<td class="text-right">
+											<button class="main-btn icon-btn btn-remove" data-id="{{ cart_products.id }}">
+												<i class="fa fa-trash"></i>
+											</button>
+										</td>
+									</tr>
+									{% endfor %}
+								</tbody>
+								<tfoot>
+									<tr>
+										<th class="empty" colspan="3"></th>
+										<th>SUBTOTAL</th>
+										<th colspan="2" class="sub-total">$ {{sub_total}}</th>
+									</tr>	
+									<tr>
+										<th class="empty" colspan="3"></th>
+										<th>SHIPING</th>
+										<td colspan="2">$ 150 </td>
+									</tr>
+									<tr>
+										<th class="empty" colspan="3"></th>
+										<th>TOTAL</th>
+										<th colspan="2" class="finale-price">$ {{finale_price}}</th>
+									</tr>
+								</tfoot>
+							</table>
+							<div class="pull-right">
+								<button class="primary-btn">Place Order</button>
+							</div>
+						</div>
+
+					</div>
+				</div>
+			</div>
+			<!-- /row -->
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /section -->
+
+{% endblock main %}
+{% block extra_scripts %}
+<script>
+	$(document).ready(function(){
+		// Increase or decrease quantity
+		$(".increase-qty, .decrease-qty").click(function () {
+            let id = $(this).data("id");
+            let action = $(this).hasClass("increase-qty") ? "increase" : "decrease";
+
+            $.ajax({
+                url: "{% url 'qtyincdec' %}",  // Adjust this URL based on your Django URL name
+                method: "POST",
+				headers: {
+					"X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val(),
+				},
+                data: JSON.stringify({"id": id, "action": action}),
+				contentType: "application/json",
+				dataType: "json",
+				success: function (res) {
+					if (res.status == 200) {
+						// Update quantity and total price
+						$("span.quantity[data-id='" + res.id + "']").text(res.quantity);
+						$("strong.primary-color[data-id='" + res.id + "']").text("$ " + res.qty_total_price);
+						$(".cart-total-price").text("$ " + res.cart_total);
+						$(".sub-total").text("$ " + res.sub_total);
+						$(".finale-price").text("$ " + res.finale_price);
+						alertify.success(res.messages)	
+					}
+					else if (res.status == 400) {
+						alertify.error(res.messages);
+					}
+					else if (res.status == 401) {
+						alertify.error(res.messages);
+					}
+					else if (res.status == 402) {
+						alertify.error(res.messages);
+					}
+					else if (res.status == 403) {
+						alertify.error(res.messages);
+					}
+				}
+				
+            });
+        });
+		// Increase or decrease quantity
+
+		// Remove item from cart
+		$(".btn-remove").click(function(){
+			let id = $(this).data("id");
+			let row = $(this).closest("tr");
+
+			$.ajax({
+				url: "{% url 'removetocart' %}",  // Ensure this URL is correctly mapped in Django
+				method: "POST",
+				headers: {
+					"X-CSRFToken": $('input[name=csrfmiddlewaretoken]').val(),
+				},
+				data: JSON.stringify({"id": id}),
+				contentType: "application/json",
+				dataType: "json",
+				success: function(res){
+					if(res.status == 200){
+						row.fadeOut(300, function(){ $(this).remove(); });
+						$("strong.primary-color[data-id='" + res.id + "']").text("$ " + res.qty_total_price);
+						$(".cart-total-price").text("$ " + res.cart_total);
+						$(".sub-total").text("$ " + res.sub_total);
+						$(".finale-price").text("$ " + res.finale_price);
+						alertify.success(res.messages);
+					}
+					else if (res.status == 400) {
+						alertify.error(res.messages);
+					}
+				}
+			});
+
+		});
+		// Remove item from cart
+	});
+</script>
+{% endblock extra_scripts %}

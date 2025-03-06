@@ -1,0 +1,9 @@
+{% load static %}    
+<script>
+  // Set position for notifications
+  alertify.set('notifier', 'position', 'top-right');
+  // Loop through Django messages and display them using Alertify
+  {% for msg in messages %}
+      alertify.success('{{ msg }}', 5);
+  {% endfor %}
+</script>

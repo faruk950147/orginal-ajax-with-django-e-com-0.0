@@ -1,0 +1,47 @@
+{% load static %}
+
+	<!-- section -->
+	<div class="section">
+		<!-- container -->
+		<div class="container">
+			<!-- row -->
+			<div class="row">
+				<!-- banner -->
+				 {% if banners %}
+				{% for banner in banners %}
+				<div class="col-md-4 col-sm-6">
+					<a class="banner banner-1" href="{% url "singleproductview" banner.product.id %}">
+						{% if banner.image %}
+						<img src="{{banner.image.url}}" alt="">
+						{% else %}
+						<img src="{% static "img/no-image.jpg" %}" alt="">
+						{% endif %}
+						<div class="banner-caption text-center">
+							{% if banner.product.discount  %}
+							<div class="product-label">
+								{% if banner.product.discount_title %}
+								<h4 class="white-color sale">{{banner.product.discount_title}}</h4>
+								{% endif %}
+								<h4 class="white-color">{{banner.product.discount}}%</h4>
+							</div>
+
+							{% endif %}
+							<h2 class="white-color">{{banner.product.title|title|truncatewords:3}}</h2>
+							<h3 class="product-price white-color"> 										
+								& {{banner.product.price|title}} 
+								{% if banner.product.old_price %}
+								<del class="product-old-price">$ {{banner.product.old_price|title}}</del>									
+								{% endif %}
+							</h3>
+						</div>
+					</a>
+				</div>
+				{% endfor %}
+				{% endif %}
+				<!-- /banner -->
+			</div>
+			<!-- /row -->
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /section -->

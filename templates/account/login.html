@@ -1,0 +1,145 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Sign In{% endblock title %} 
+{% block main %}
+  <!-- ============================ COMPONENT SIGN IN   ================================= -->
+  <div class="container">
+    <div class="d-flex flex-column text-center" style="max-width: 600px; margin: 0 auto;">
+      <div class="form-title text-center" style="margin: 50px;">
+        <h4 class="title0">Sign In</h4>
+      </div>
+      <form  id="form" method="POST">
+        <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+
+        <div class="username-error form-group" style="display: none">
+
+        </div>
+        <div class="form-group" style="margin-top: 15px;">
+          <input type="text" name="username" placeholder="Username Or Email" id="id_username" class="form-control" required/>
+        </div>
+
+        <div class="form-group eye-add" style="margin-top: 15px;">
+          <input type="password" name="password" placeholder="Password" id="id_password" class="form-control" required/>
+            <span class="text-muted eye-add-style" id="showHide">
+            <i class="fas fa-eye-slash fa-lg me-3 fa-fw text-info" id="icon"></i></span>
+        </div>
+
+        <div class="form-group" style="margin-top: 15px;">
+          <button  type="button" class="btn btn-info btn-lg form-control" id="signBtn">Sign In</button>
+        </div>
+      </form>
+      <span class="text-muted">Don't have an account? <a href="{% url 'signup' %}">Sign Up</a></span><br>
+      <span class="text-muted">Forgot Password? <a href="{% url 'resetpasswordview' %}">Reset Password</a></span>
+      <div class="text-center text-muted delimiter">or use a social network</div>
+      <div class="d-flex justify-content-center social-buttons m-2">
+        <button type="button" class="btn btn-info btn-round m-2" data-toggle="tooltip" data-placement="top" title="Twitter">
+          <i class="fab fa-twitter"></i>
+        </button>
+        <button type="button" class="btn btn-info btn-round m-2" data-toggle="tooltip" data-placement="top" title="Facebook">
+        <button type="button" class="btn btn-info btn-round m-2" data-toggle="tooltip" data-placement="top" title="Facebook">
+          <i class="fab fa-facebook"></i>
+        </button>
+        <button type="button" class="btn btn-info btn-round m-2" data-toggle="tooltip" data-placement="top" title="Linkedin">
+          <i class="fab fa-linkedin"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  <!-- ============================ COMPONENT SIGN IN  END.// ================================= -->
+
+{% endblock main %}
+{% block extra_scripts %}
+  <script>
+    $(document).ready(function(){
+
+      $('#signBtn').on("click", function(e) {
+        e.preventDefault();
+    
+        let username = $('#form #id_username').val().trim();
+        let password = $('#form #id_password').val().trim();
+        let csrfmiddlewaretoken = $('#form input[name=csrfmiddlewaretoken]').val();
+    
+        if (username.length > 0 && password.length > 0) {
+            $.ajax({
+                url: "{% url 'sign' %}",
+                method: "POST",
+                headers: { 
+                  "X-CSRFToken": csrfmiddlewaretoken  // CSRF token passing
+                },
+                contentType: "application/json",
+                data: JSON.stringify({username: username, password: password}),
+                dataType: "json",
+                success: function(res) {
+                    if (res.status == 200) {
+
+                        alertify.success('Admin login successful!');
+                        window.location.href = "/admin"; // Redirect to admin panel
+
+                    } else if (res.status == 201) {
+
+                        alertify.success('User login successful!');
+                        window.location.href = "/"; // Redirect to homepage
+
+                    } else if (res.status == 403) {
+              
+                        alertify.error('Your account is not active!');
+                        $('#form')[0].reset();
+
+                    } else if (res.status == 400) {
+
+                        alertify.error(res.messages);
+                        $('#form')[0].reset();
+
+                    }
+                    else  if (res.status == 500) {
+
+                        alertify.error(res.messages);
+                        $('#form')[0].reset();
+
+                    }
+                },
+            });
+        } else {
+            if (username === "") {
+                alertify.error('Please enter your username or email.');
+            }
+            if (password === "") {
+                alertify.error('Please enter your password.');
+            }
+        }
+    });
+    
+      //All Validation
+      $( "#id_username" ).on( "keyup blur change input focus", function(e){
+        e.preventDefault();
+        const username = $("#form #id_username").val().trim();
+        if(username.length > 0){
+          $.ajax({
+            url:"{% url 'signinvalidation' %}",
+            method:"POST",
+            data: JSON.stringify({username:username}),
+            contentType: "application/json",
+            dataType:"json",
+            success:function(res){
+              if(res.username_error){
+                $("#id_username").addClass("is-invalid");
+                $(".username-error").html(res.username_error);
+                $(".username-error").css("display", "block");
+                $("#signupBtn").attr('disabled', true);
+              }
+              else{
+                if(res.username_valid){
+                  $("#id_username").removeClass("is-invalid");
+                  $("#id_username").addClass("is-valid");
+                  $(".username-error").css("display", "none");
+                  $("#signupBtn").attr('disabled', false);
+                }
+              } 
+            },
+          });
+        }
+      });
+
+  }); 
+  </script>
+{% endblock extra_scripts %}

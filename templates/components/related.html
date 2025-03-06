@@ -1,0 +1,72 @@
+{% load static %}
+	<!-- section -->
+	<div class="section">
+		<!-- container -->
+		<div class="container">
+			<!-- row -->
+			<div class="row">
+				<!-- section title -->
+				<div class="col-md-12">
+					<div class="section-title">
+						<h2 class="title">Picked For You</h2>
+					</div>
+				</div>
+				<!-- section title -->
+
+				<!-- Product Single -->
+				 {% if related_products %}
+				 {% for related_product in related_products %}
+				<div class="col-md-3 col-sm-6 col-xs-6">
+					<div class="product product-single">
+						<div class="product-thumb">
+							{% if related_product.discount %}
+							<div class="product-label">
+								{% if related_product.discount_title %}
+								<span>{{related_product.discount_title}}</span>
+								<span class="sale">{{related_product.discount}}%</span>
+								{% endif %}
+							</div>
+							{% endif %}
+		
+							<a href="{% url "singleproductview" related_product.id %}" class="main-btn quick-view"><i class="fa fa-search-plus"></i> Quick view</a>
+							{% if related_product.image %}
+								<img src="{{related_product.image.url}}" alt="">
+							{% elif related_product.products_images.first.image %}
+								<img src="{{related_product.products_images.first.image.url}}" alt="">
+							{% else %}
+								<img src="{% static "img/no-image.jpg" %}" alt="">
+							{% endif %}
+						</div>
+						<div class="product-body">
+							<h3 class="product-price"> 										
+							& {{related_product.price|title}} 
+							{% if related_product.old_price %}
+							<del class="product-old-price">$ {{related_product.old_price|title}}</del>									
+							{% endif %}
+							</h3>
+							<div class="product-rating ">
+								<i class="fa fa-star{% if related_product.avaregereview < 1%}-o empty{% endif%}"></i>
+								<i class="fa fa-star{% if related_product.avaregereview < 2%}-o empty{% endif%}"></i>
+								<i class="fa fa-star{% if related_product.avaregereview < 3%}-o empty{% endif%}"></i>
+								<i class="fa fa-star{% if related_product.avaregereview < 4%}-o empty{% endif%}"></i>
+								<i class="fa fa-star{% if related_product.avaregereview < 5%}-o empty{% endif%}"></i>
+								{{ related_product.avaregereview |stringformat:".2f"}}
+							</div>
+							
+							<h2 class="product-name"><a href="{% url "singleproductview" related_product.id %}">{{related_product.title|title}}</a></h2>
+							<div class="product-btns">
+								<button class="main-btn icon-btn"><i class="fa fa-heart"></i></button>
+							</div>
+						</div>
+					</div>
+				</div>
+				{% endfor %}
+				{% endif %}
+				<!-- /Product Single -->
+
+			</div>
+			<!-- /row -->
+		</div>
+		<!-- /container -->
+	</div>
+	<!-- /section -->

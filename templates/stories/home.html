@@ -1,0 +1,52 @@
+{% extends 'base.html' %} 
+{% load static %} 
+{% block title %}Home{% endblock title %} 
+{% block main %}
+{% include "components/slider.html" %}
+{% include "components/banner.html" %}
+{% include "components/deals.html" %}
+{% include "components/new_collection.html" %}
+{% include "components/girls.html" %}
+{% include "components/men.html" %}
+{% include "components/latest.html" %}
+{% include "components/pickup.html" %}
+{% endblock main %}
+{% block extra_scripts %}
+<script>
+    function startCountdown(productId, deadline) {
+        let countDownDate = new Date(deadline).getTime();
+        let daysEl = document.getElementById("days-" + productId);
+        let hoursEl = document.getElementById("hours-" + productId);
+        let minutesEl = document.getElementById("minutes-" + productId);
+        let secondsEl = document.getElementById("seconds-" + productId);
+
+        if (!daysEl || !hoursEl || !minutesEl || !secondsEl) return; // Prevent errors
+
+        let x = setInterval(() => {
+            let now = new Date().getTime();
+            let distance = countDownDate - now;
+
+            if (distance < 0) {
+                clearInterval(x);
+                daysEl.innerHTML = "0";
+                hoursEl.innerHTML = "0";
+                minutesEl.innerHTML = "0";
+                secondsEl.innerHTML = "0";
+            } else {
+                let days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                let hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                let minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                let seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                daysEl.innerHTML = days;
+                hoursEl.innerHTML = hours;
+                minutesEl.innerHTML = minutes;
+                secondsEl.innerHTML = seconds;
+            }
+        }, 1000);
+    }
+    {% for deals_product in deals_products %}
+        startCountdown({{ deals_product.id }}, "{{ deals_product.offers_deadline|date:'c' }}");
+    {% endfor %}
+</script>
+{% endblock extra_scripts %}
