@@ -138,36 +138,49 @@
 
 			$(document).on('change', '#sizeid', function(e){
 				e.preventDefault();
-			
+				
 				let productid = $('#productid').val();
-				let size = $('#sizeid').val();
-
-				if(!productid){
-					alertify.error("Product id not found");
-					return;
-				}
-
-				// validation
+				let size = $(this).val();
+				let csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val();
+				
 				if (!size) {  
 					alertify.error("Please select a size first!");  
 					return;  
-				}	
+				}
+			
 				$.ajax({
-					method: 'POST',
+					type: 'POST',
 					url: '{% url "ajax_variant_select" %}',
 					data: {
 						productid: productid,
 						size: size,
-						csrfmiddlewaretoken: $('input[name=csrfmiddlewaretoken]').val(),
+						csrfmiddlewaretoken: csrfmiddlewaretoken,
 						action: 'post'
 					},
 					dataType: 'json',
-					success: function (data) {
+					success: function(data) {
+						// ✅ Update Color List
 						$('#appendHere').html(data.rendered_table);
+						
+						// ✅ Update Selected Size & Color (If Available)
+						if (data.size) {
+							console.log('Size: ', data.size);	
+							$('#selected-size').text(data.size);
+						}
+						if (data.color) {
+							console.log('Color: ', data.color);
+							$('#selected-color').text(data.color);
+						}
+			
+						// ✅ Update Price
+						if (data.variant_price) {
+							console.log('Price: ', data.variant_price);
+							$('.product-price').text('$' + data.variant_price);
+						}
 					},
-					error: function (xhr, status, error) {
-						alertify.error("Error: " + xhr.responseText);
-					}
+					error: function(xhr) {
+						console.log("AJAX Error:", xhr.responseText);
+					}				
 				});
 			});
 			
