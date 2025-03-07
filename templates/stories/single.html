@@ -191,13 +191,12 @@
 					return;  
 				}
 				$.ajax({
-					type: 'POST',
+					method: 'POST',
 					url: '',
 					data: {
 						productid: productid,
 						color: color,
 						csrfmiddlewaretoken: csrfmiddlewaretoken,
-						action: 'post'
 					},
 					dataType: 'json',
 					success: function(data) {
