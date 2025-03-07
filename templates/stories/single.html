@@ -149,13 +149,12 @@
 				}
 			
 				$.ajax({
-					type: 'POST',
-					url: '{% url "ajax_variant_select" %}',
+					method: 'POST',
+					url: '{% url "ajax_variant_select_sizes" %}',
 					data: {
 						productid: productid,
 						size: size,
 						csrfmiddlewaretoken: csrfmiddlewaretoken,
-						action: 'post'
 					},
 					dataType: 'json',
 					success: function(data) {
@@ -167,10 +166,6 @@
 							console.log('Size: ', data.size);	
 							$('#selected-size').text(data.size);
 						}
-						if (data.color) {
-							console.log('Color: ', data.color);
-							$('#selected-color').text(data.color);
-						}
 			
 						// ✅ Update Price
 						if (data.variant_price) {
@@ -181,6 +176,38 @@
 					error: function(xhr) {
 						console.log("AJAX Error:", xhr.responseText);
 					}				
+				});
+			});
+
+			$(document).on('change', 'input[name="colorid"]', function(e){
+				e.preventDefault();
+
+				let productid = $('#productid').val();
+				let color = $(this).val();
+				let csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val();
+			
+				if (!color) {  
+					alertify.error("Please select a color first!");  
+					return;  
+				}
+				$.ajax({
+					type: 'POST',
+					url: '',
+					data: {
+						productid: productid,
+						color: color,
+						csrfmiddlewaretoken: csrfmiddlewaretoken,
+						action: 'post'
+					},
+					dataType: 'json',
+					success: function(data) {
+						// ✅ Update Selected Color
+						$('#appendHere').html(data.rendered_table);
+
+					},
+					error: function(xhr) {
+						console.log("AJAX Error:", xhr.responseText);
+					}
 				});
 			});
 			

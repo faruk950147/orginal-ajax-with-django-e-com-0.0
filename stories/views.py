@@ -1,4 +1,3 @@
-from ast import Try
 from django.shortcuts import render,redirect, get_object_or_404
 from django.template.loader import render_to_string
 from django.utils.decorators import method_decorator
@@ -102,74 +101,31 @@ def SingleProductView(request, id):
     return render(request, 'stories/single.html', context)
 
 
-def ajax_variant_select(request):
-    """ Updates the price and color options when both Size & Color are changed """
-    if request.method == 'POST' and request.POST.get('action') == 'post':
+def ajax_variant_select_sizes(request):
+    """ Updates the color options when Size is changed """
+    if request.method == 'POST':
         productid = request.POST.get('productid')
         size_id = request.POST.get('size')
-        color_id = request.POST.get('color')
 
         if not productid:
-            return HttpResponseBadRequest(JsonResponse({'messages': 'Invalid product ID'}))
-        """All variants of the product have been queried only once."""
-        variants = Variants.objects.filter(product_id=productid)  # Filter variants by product ID
+            return JsonResponse({'messages': 'Invalid product ID'})
 
-        if size_id and not color_id:
+        # All variants of the product are queried only once
+        variants = Variants.objects.filter(product_id=productid)
+
+        if size_id:
             """If only Size is selected, filter colors based on the selected Size."""
             colors = variants.filter(size_id=size_id).distinct()  # Filter colors based on the selected Size
-            
-            selected_size = variants.filter(size_id=size_id).first()  # Selected size title 
+
+            selected_size = variants.filter(size_id=size_id).first()  # Selected size title
             selected_size_title = selected_size.size.title if selected_size else "Unknown Size"
-            
+
             return JsonResponse({
                 'rendered_table': render_to_string('color_list.html', {'colors': colors}),
                 'size': selected_size_title
             })
 
-        elif size_id and color_id:
-            """If both Size and Color are selected, find the specific Variant."""
-            variant = variants.filter(size_id=size_id, color_id=color_id).first()  # Find the specific Variant
-            if not variant:
-                return HttpResponseBadRequest(JsonResponse({'messages': 'Variant not found'}))
-
-            return JsonResponse({
-                'rendered_table': render_to_string('color_list.html', {'variant': variant}),
-                'size': variant.size.title,
-                'color': variant.color.title,
-                'variant_price': variant.price
-            })
-
-    return HttpResponseBadRequest(JsonResponse({'messages': 'Invalid request'}))
-    """ Updates the price and color options when both Size & Color are changed """
-    if request.method == 'POST' and request.POST.get('action') == 'post':
-        productid = request.POST.get('productid')
-        size_id = request.POST.get('size')
-        color_id = request.POST.get('color')
-
-        if not productid:
-            return HttpResponseBadRequest(JsonResponse({'messages': 'Invalid product ID'}))
-        """All variants of the product have been queried only once."""
-        variants = Variants.objects.filter(product_id=productid)  # Filter variants by product ID
-
-        if size_id and not color_id:
-            """If only Size is selected, filter colors based on the selected Size."""
-            colors = variants.filter(size_id=size_id).distinct()  # Filter colors based on the selected Size
-            return JsonResponse({'rendered_table': render_to_string('color_list.html', {'colors': colors})})
-
-        elif size_id and color_id:
-            """If both Size and Color are selected, find the specific Variant."""
-            variant = variants.filter(size_id=size_id, color_id=color_id).first()  # Find the specific Variant
-            if not variant:
-                return HttpResponseBadRequest(JsonResponse({'messages': 'Variant not found'}))
-
-            return JsonResponse({
-                'rendered_table': render_to_string('color_list.html', {'variant': variant}),
-                'size': variant.size.title,
-                'color': variant.color.title,
-                'variant_price': variant.price
-            })
-
-    return HttpResponseBadRequest(JsonResponse({'messages': 'Invalid request'}))
+    return JsonResponse({'messages': 'Invalid request'})
 
 
 @method_decorator(never_cache, name='dispatch')
