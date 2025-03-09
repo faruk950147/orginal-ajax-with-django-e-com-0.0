@@ -68,10 +68,9 @@ class Product(models.Model):
     brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True, related_name='bra_products')
     variant = models.CharField(max_length=12, choices=VARIANTS, default='None')
     title = models.CharField(max_length=150, unique=True, null=False, blank=False)
-    model_title = models.CharField(max_length=150, null=True, blank=True)
+    model = models.CharField(max_length=150, null=True, blank=True)
     available_in_stock_msg = models.CharField(max_length=150, null=True, blank=True)
     in_stock_max = models.PositiveIntegerField(default=1)
-    in_stock_min = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField(default=0)
     old_price = models.PositiveIntegerField(default=0)
     discount_title = models.CharField(max_length=150, null=True, blank=True)
@@ -82,8 +81,7 @@ class Product(models.Model):
     description = models.TextField(default='N/A')
     addition_des = models.TextField(default='N/A')
     return_policy = models.TextField(default='N/A')
-    image = models.ImageField(upload_to='products', null=True, blank=True)
-    is_active = models.BooleanField(default=False)
+    is_timeline = models.BooleanField(default=False)
     deals = models.BooleanField(default=False)
     new_collection = models.BooleanField(default=False)
     latest_collection = models.BooleanField(default=False)
@@ -110,13 +108,6 @@ class Product(models.Model):
         if self.offers_deadline:
             return (self.offers_deadline - timezone.now()).total_seconds()
         return None
-
-    def discount_price(self):
-        if self.discount:
-            discount_price = self.price - ((self.discount / 100) * self.price)
-            return max(discount_price, 0)
-        else:
-            return self.price
         
     @property    
     def avaregereview(self):
@@ -126,12 +117,6 @@ class Product(models.Model):
     @property
     def countreview(self):
         return Review.objects.filter(product=self, status=True).count()
-    
-    @property
-    def image_tag(self):   
-        if self.image:
-            return mark_safe('<img src="%s" width="50" height="50"/>' % (self.image.url))
-        return mark_safe('<span>No Image</span>')
     
     def __str__(self):
         return f'{self.title} - {"Active" if self.status else "Inactive"}'

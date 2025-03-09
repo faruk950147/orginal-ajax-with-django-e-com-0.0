@@ -29,9 +29,7 @@
 							{% endif %}
 		
 							<a href="{% url "singleproductview" new_collection.id %}" class="main-btn quick-view"><i class="fa fa-search-plus"></i> Quick view</a>
-							{% if new_collection.image %}
-								<img src="{{new_collection.image.url}}" alt="">
-							{% elif new_collection.products_images.first.image %}
+							{% if new_collection.products_images.first.image %}
 								<img src="{{new_collection.products_images.first.image.url}}" alt="">
 							{% else %}
 								<img src="{% static "img/no-image.jpg" %}" alt="">

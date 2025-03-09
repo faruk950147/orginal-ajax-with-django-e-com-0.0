@@ -88,9 +88,7 @@
 								
 
 									<a href="{% url "singleproductview" deals_product.id %}" class="main-btn quick-view"><i class="fa fa-search-plus"></i> Quick view</a>
-									{% if deals_product.image %}
-										<img src="{{deals_product.image.url}}" alt="">
-									{% elif deals_product.products_images.first.image %}
+									{% if deals_product.products_images.first.image %}
 										<img src="{{deals_product.products_images.first.image.url}}" alt="">
 									{% else %}
 									    <img src="{% static "img/no-image.jpg" %}" alt="">

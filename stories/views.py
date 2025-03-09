@@ -24,7 +24,7 @@ class HomeView(generic.View):
             'sliders': Slider.objects.filter(status=True).order_by('id'),
             'banners': Banner.objects.filter(status=True).order_by('id')[:3],
             'side_deals_banners': Banner.objects.filter(status=True, side_deals=True, new_side=True).order_by('id')[:1],
-            'deals_products': Product.objects.filter(offers_deadline__isnull=False,  is_active=True, deals=True, status=True).order_by("id")[:6],
+            'deals_products': Product.objects.filter(offers_deadline__isnull=False,  is_timeline=True, deals=True, status=True).order_by("id")[:6],
             'current_time': timezone.now(),
             'new_collections': Product.objects.filter(status=True, new_collection=True).order_by('id')[:4], 
             'girls_collections': Product.objects.filter(status=True, girls_collection=True).order_by('id')[:4],
@@ -38,20 +38,11 @@ class HomeView(generic.View):
 def SingleProductView(request, id):
     # Retrieve the product by id or return a 404 error if not found
     product = get_object_or_404(Product, id=id)
-    
     # Retrieve related products:
-    related_products = Product.objects.filter(
-        category=product.category
-    ).exclude(
-        id=id
-    ).select_related(
-        'category'
-    ).order_by('-id')[:4]
-    
+    related_products = Product.objects.filter(category=product.category).exclude(id=id).select_related('category').order_by('-id')[:4]
     # Retrieve active reviews for the product:
     reviews = Review.objects.filter(product=product, status=True).select_related('user')
     reviews_total = reviews.count()
-
     # Build the initial context dictionary.
     context = {
         'product': product,
@@ -60,7 +51,6 @@ def SingleProductView(request, id):
         'reviews_total': reviews_total,
         'variant': None,  # Default variant, none selected yet.
     }
-
     # Check if the product has variants.
     if product.variant != 'None':
         variant = None
@@ -70,20 +60,15 @@ def SingleProductView(request, id):
             color_id = request.POST.get('colorid')
             variant = get_object_or_404(Variants, id=color_id)
             colors = Variants.objects.filter(product_id=id, size_id=variant.size_id) if variant else []
-            sizes = Variants.objects.raw(
-                'SELECT * FROM stories_variants WHERE product_id=%s GROUP BY size_id', [id]
-            ) if variant else []
+            sizes = Variants.objects.raw('SELECT * FROM stories_variants WHERE product_id=%s GROUP BY size_id', [id]) if variant else []
         else:
             # Retrieve all variants for the product.
             variants = list(Variants.objects.filter(product_id=id))
-            
             # Check if any variants exist before trying to access the first one.
             if variants:
                 # Set colors to variants that share the same size_id as the first variant.
                 colors = Variants.objects.filter(product_id=id, size_id=variants[0].size_id)
-                sizes = Variants.objects.raw(
-                    'SELECT * FROM stories_variants WHERE product_id=%s GROUP BY size_id', [id]
-                )
+                sizes = Variants.objects.raw('SELECT * FROM stories_variants WHERE product_id=%s GROUP BY size_id', [id])
                 variant = variants[0]
             else:
                 # If no variants exist, fallback to empty lists and None.
