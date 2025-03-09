@@ -115,9 +115,7 @@
 										{% for cart_products in cart_products %}
 										<div class="product product-widget">
 											<div class="product-thumb">
-												{% if cart_products.product.image %}
-												<img src="{{cart_products.product.image.url}}" alt="">
-												{% elif cart_products.product.products_images.first.image %}
+												{% if cart_products.product.products_images.first.image %}
 												<img src="{{cart_products.product.products_images.first.image.url}}" alt="">
 												{% else %}
 												<img src="{% static "img/no-image.jpg" %}" alt="">
