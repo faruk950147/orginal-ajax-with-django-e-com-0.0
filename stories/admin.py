@@ -92,10 +92,10 @@ class SliderAdmin(ModelAdmin):
 admin.site.register(Slider, SliderAdmin)
 
 class BannerAdmin(ModelAdmin):
-    list_display = ['id', 'product', 'title', 'image_tag', 'side_deals', 'status', 'created_date', 'updated_date']
-    list_editable = ['side_deals', 'status']
+    list_display = ['id', 'product', 'title', 'image_tag', 'side_deals', 'new_side', 'status', 'created_date', 'updated_date']
+    list_editable = ['side_deals', 'new_side', 'status']
     search_fields = ['title']
-    list_filter = ['product', 'side_deals', 'status', 'created_date', 'updated_date']
+    list_filter = ['product', 'side_deals', 'new_side', 'status', 'created_date', 'updated_date']
     readonly_fields = ['id', 'image_tag', 'created_date', 'updated_date']
 admin.site.register(Banner, BannerAdmin)
 
