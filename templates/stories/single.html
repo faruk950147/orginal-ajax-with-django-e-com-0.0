@@ -158,19 +158,15 @@
 					},
 					dataType: 'json',
 					success: function(data) {
-						// ✅ Update Color List
 						$('#appendHere').html(data.rendered_table);
 						
-						// ✅ Update Selected Size & Color (If Available)
-						if (data.size) {
-							console.log('Size: ', data.size);	
+						if (data && data.size) {
+							console.log(data.size)
 							$('#selected-size').text(data.size);
 						}
-			
-						// ✅ Update Price
-						if (data.variant_price) {
-							console.log('Price: ', data.variant_price);
-							$('.product-price').text('$' + data.variant_price);
+						if (data && data.price) {
+							console.log("Price: " + data.price)
+							$('.product-price').text('$' + data.price);
 						}
 					},
 					error: function(xhr) {
@@ -179,6 +175,7 @@
 				});
 			});
 
+			/*
 			$(document).on('change', 'input[name="colorid"]', function(e){
 				e.preventDefault();
 
@@ -209,7 +206,7 @@
 					}
 				});
 			});
-			
+			*/
 		});
 	</script>
 {% endblock extra_scripts %}	
