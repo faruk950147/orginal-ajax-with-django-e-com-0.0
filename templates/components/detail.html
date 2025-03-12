@@ -152,8 +152,8 @@
 													<li><span class="text-uppercase">Color:</span></li>
 													{% for color in colors %}
 														<input type="radio" {% if variant and variant.id == color.id %} checked {% endif %}
-															name="colorid" id="colorid" value="{{ color.id }}">
-														<li {% if variant and variant.id == color.id %} class="active" {% endif %} onchange="if(this.value) this.form.submit();">
+															name="colorid" id="colorid" value="{{ color.id }}" onchange="if(this.value) this.form.submit();">
+														<li {% if variant and variant.id == color.id %} class="active" {% endif %}>
 															<a style="background-color:{{ color.color.code }}; color: #D9D9D9; text-shadow: 1px 1px #000000; width: 90px">
 																{{ color.price }} {{ color.color }}
 															</a>
