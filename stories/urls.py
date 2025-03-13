@@ -1,6 +1,6 @@
 from django.urls import path
 from stories.views import(
-    HomeView, SingleProductView,ReviewsView,ajax_variant_select_sizes,
+    HomeView, SingleProductView, ReviewsView, ajax_variant_select_sizes,
 )
 
 urlpatterns = [

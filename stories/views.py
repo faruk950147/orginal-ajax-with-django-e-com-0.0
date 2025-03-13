@@ -117,6 +117,7 @@ def ajax_variant_select_sizes(request):
     return JsonResponse({'messages': 'Invalid request'})
 
 
+
 @method_decorator(never_cache, name='dispatch')
 class ReviewsView(LoginRequiredMixin, generic.View):
     login_url = reverse_lazy('sign')

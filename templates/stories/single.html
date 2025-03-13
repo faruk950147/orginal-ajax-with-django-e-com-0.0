@@ -158,16 +158,21 @@
 					},
 					dataType: 'json',
 					success: function(data) {
-						$('#appendHere').html(data.rendered_table);
+						if(data.status == 200){
+							$('#appendHere').html(data.rendered_table);
 						
-						if (data && data.size) {
-							console.log(data.size)
-							$('#selected-size').text(data.size);
+							if (data && data.size) {
+								$('#selected-size').text('Selected Size: ' + data.size);
+							}
+							if (data && data.price) {
+								$('.product-price').text('$ ' + data.price);
+							}
+							alertify.success(data.messages)
 						}
-						if (data && data.price) {
-							console.log("Price: " + data.price)
-							$('.product-price').text('$' + data.price);
+						else if(data.status == 400){
+							alertify.error(data.messages)
 						}
+
 					},
 					error: function(xhr) {
 						console.log("AJAX Error:", xhr.responseText);
@@ -175,38 +180,6 @@
 				});
 			});
 
-			/*
-			$(document).on('change', 'input[name="colorid"]', function(e){
-				e.preventDefault();
-
-				let productid = $('#productid').val();
-				let color = $(this).val();
-				let csrfmiddlewaretoken = $('input[name=csrfmiddlewaretoken]').val();
-			
-				if (!color) {  
-					alertify.error("Please select a color first!");  
-					return;  
-				}
-				$.ajax({
-					method: 'POST',
-					url: '',
-					data: {
-						productid: productid,
-						color: color,
-						csrfmiddlewaretoken: csrfmiddlewaretoken,
-					},
-					dataType: 'json',
-					success: function(data) {
-						// ✅ Update Selected Color
-						$('#appendHere').html(data.rendered_table);
-
-					},
-					error: function(xhr) {
-						console.log("AJAX Error:", xhr.responseText);
-					}
-				});
-			});
-			*/
 		});
 	</script>
 {% endblock extra_scripts %}	
