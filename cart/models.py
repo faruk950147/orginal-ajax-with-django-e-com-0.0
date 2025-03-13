@@ -30,7 +30,7 @@ class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     coupon = models.ForeignKey(Coupon, on_delete=models.SET_NULL, null=True, blank=True)
-    variant = models.ForeignKey(Variants, on_delete=models.CASCADE, blank=True, null=True) 
+    variant = models.ForeignKey(Variants, on_delete=models.SET_NULL, blank=True, null=True) 
     quantity = models.PositiveIntegerField(default=1)
     
     class Meta:

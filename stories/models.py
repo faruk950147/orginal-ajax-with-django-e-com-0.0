@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 import uuid
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
-from django.db.models import Avg, Count
+from django.db.models import F, Avg, Count
 User = get_user_model()
 
 
@@ -120,7 +120,7 @@ class Product(models.Model):
     
     def __str__(self):
         return f'{self.title} - {"Active" if self.status else "Inactive"}'
-    
+     
 class Images(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='products_images')
     title = models.CharField(max_length=50, null=True, blank=True)
@@ -143,8 +143,8 @@ class Images(models.Model):
         return f'{self.product.title}, {self.product.title}'
     
 class Color(models.Model):
-    title = models.CharField(max_length=20)
-    code = models.CharField(max_length=10, blank=True,null=True)
+    title = models.CharField(max_length=20, unique=True, null=False, blank=False)
+    code = models.CharField(max_length=20, unique=True, null=False, blank=False)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     
@@ -163,8 +163,8 @@ class Color(models.Model):
         return f'{self.title} x {self.code}'
 
 class Size(models.Model):
-    title = models.CharField(max_length=20)
-    code = models.CharField(max_length=10, blank=True,null=True)
+    title = models.CharField(max_length=20, unique=True, null=False, blank=False)
+    code = models.CharField(max_length=10, unique=True, null=False, blank=False)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)    
 
@@ -178,8 +178,8 @@ class Size(models.Model):
 class Variants(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='product_variants')
     title = models.CharField(max_length=100, blank=True,null=True)
-    color = models.ForeignKey(Color, on_delete=models.CASCADE,blank=True,null=True)
-    size = models.ForeignKey(Size, on_delete=models.CASCADE,blank=True,null=True)
+    color = models.ForeignKey(Color, on_delete=models.SET_NULL,blank=True,null=True)
+    size = models.ForeignKey(Size, on_delete=models.SET_NULL,blank=True,null=True)
     image_id =  models.PositiveIntegerField(blank=True, null=True, default=0)
     quantity = models.PositiveIntegerField(default=1)
     price = models.PositiveIntegerField(default=0)
@@ -214,7 +214,7 @@ class Variants(models.Model):
 
 class  Slider(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='top_sliders')
-    title = models.CharField(max_length=150, null=False, blank=False)
+    title = models.CharField(max_length=150, unique=True, null=False, blank=False)
     image = models.ImageField(upload_to='slider', null=True, blank=True)
     status = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -236,7 +236,7 @@ class  Slider(models.Model):
     
 class  Banner(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    title = models.CharField(max_length=150, null=False, blank=False)
+    title = models.CharField(max_length=150, unique=True, null=False, blank=False)
     image = models.ImageField(upload_to='banners', null=True, blank=True)
     side_deals = models.BooleanField(default=False)
     new_side = models.BooleanField(default=False)
@@ -260,7 +260,7 @@ class  Banner(models.Model):
      
 class  Future(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='computers')
-    title = models.CharField(max_length=150, null=True, blank=True)
+    title = models.CharField(max_length=150, unique=True, null=True, blank=True)
     hard_disk = models.CharField(max_length=150, null=True, blank=True)
     cpu = models.CharField(max_length=150, null=True, blank=True)
     ram = models.CharField(max_length=150, null=True, blank=True)
