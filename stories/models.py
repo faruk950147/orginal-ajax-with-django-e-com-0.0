@@ -8,6 +8,7 @@ from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import F, Avg, Count
 from decimal import Decimal
+from django.core.validators import MinValueValidator, MaxValueValidator
 User = get_user_model()
 
 
@@ -60,21 +61,21 @@ class Product(models.Model):
         ('Colors', 'Colors'),
         ('Sizes-Colors', 'Sizes-Colors'),
     )
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='cat_products')
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, null=True, blank=True, related_name='bra_products')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, related_name='cat_products')
+    brand = models.ForeignKey(Brand, on_delete=models.SET_NULL, null=True, blank=True, related_name='bra_products')
     variant = models.CharField(max_length=12, choices=VARIANTS, default='None')
     title = models.CharField(max_length=150, unique=True, null=False, blank=False)
     model = models.CharField(max_length=150, null=True, blank=True)
     available_in_stock_msg = models.CharField(max_length=150, null=True, blank=True)
     in_stock_max = models.PositiveIntegerField(default=1)
     price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
-    old_price =  models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    old_price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     discount_title = models.CharField(max_length=150, null=True, blank=True)
     discount = models.PositiveIntegerField(default=0)
     # Time of the off_time field
     offers_deadline  = models.DateTimeField(auto_now_add=False, blank=True, null=True)  
-    keyword = models.TextField(default='N/A')
-    description = models.TextField(default='N/A')
+    keyword = models.CharField(max_length=150, default='N/A')
+    description = models.CharField(max_length=150, default='N/A')
     addition_des = models.TextField(default='N/A')
     return_policy = models.TextField(default='N/A')
     is_timeline = models.BooleanField(default=False)
@@ -100,18 +101,18 @@ class Product(models.Model):
     
     @property
     def time_remaining(self):
-        """Returns the remaining time in seconds."""
-        if self.offers_deadline:
-            return (self.offers_deadline - timezone.now()).total_seconds()
-        return None
-        
+        """Returns the remaining time in seconds if offers_deadline is active."""
+        if self.offers_deadline and self.offers_deadline > timezone.now():
+            return max((self.offers_deadline - timezone.now()).total_seconds(), 0)
+        return 0
+    
     @property    
-    def avaregereview(self):
+    def average_review(self):
         reviews = Review.objects.filter(product=self, status=True).aggregate(average=Avg('rate'))
         return float(reviews["average"] or 0)
-
+    
     @property
-    def countreview(self):
+    def count_review(self):
         return Review.objects.filter(product=self, status=True).count()
     
     def __str__(self):
@@ -174,7 +175,7 @@ class Variants(models.Model):
     size = models.ForeignKey(Size, on_delete=models.CASCADE, blank=True, null=True)
     image_id = models.PositiveIntegerField(blank=True, null=True, default=0)
     quantity = models.PositiveIntegerField(default=1)
-    price =  models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
@@ -202,7 +203,7 @@ class Variants(models.Model):
             return mark_safe('<span>No Image</span>')
 
 class  Slider(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='top_sliders')
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True, related_name='top_sliders')
     title = models.CharField(max_length=150, unique=True, null=False, blank=False)
     image = models.ImageField(upload_to='slider', null=True, blank=True)
     status = models.BooleanField(default=True)
@@ -223,8 +224,8 @@ class  Slider(models.Model):
     def __str__(self):
         return f'{self.title}'
     
-class  Banner(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+class Banner(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
     title = models.CharField(max_length=150, unique=True, null=False, blank=False)
     image = models.ImageField(upload_to='banners', null=True, blank=True)
     side_deals = models.BooleanField(default=False)
@@ -268,27 +269,11 @@ class  Future(models.Model):
         return self.title
     
 class Review(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True, blank=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     subject = models.CharField(max_length=50, blank=True)
     comment = models.TextField(blank=True)
-    rate = models.IntegerField(default=1)
-    status = models.BooleanField(default=True)
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
-
-    class Meta:
-        ordering = ['-id']
-        verbose_name_plural = '11. Reviews'
-
-    def __str__(self):
-        return self.subject if self.subject else f"Review by {self.user.username} on {self.product.title}"
-
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    subject = models.CharField(max_length=50, blank=True)
-    comment = models.TextField(blank=True)
-    rate = models.IntegerField(default=1)
+    rate = models.IntegerField(default=1, validators=[MinValueValidator(1), MaxValueValidator(5)])
     status = models.BooleanField(default=True)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
