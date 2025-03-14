@@ -23,7 +23,7 @@ class HomeView(generic.View):
         context = {
             'sliders': Slider.objects.filter(status=True).order_by('id'),
             'banners': Banner.objects.filter(status=True).order_by('id')[:3],
-            'side_deals_banners': Banner.objects.filter(status=True, side_deals=True, new_side=True).order_by('id')[:1],
+            'side_deals_banners': Banner.objects.filter(status=True, side_deals=True, new_side_is_active=True).order_by('id')[:1],
             'deals_products': Product.objects.filter(offers_deadline__isnull=False,  is_timeline=True, deals=True, status=True).order_by("id")[:6],
             'current_time': timezone.now(),
             'new_collections': Product.objects.filter(status=True, new_collection=True).order_by('id')[:4], 

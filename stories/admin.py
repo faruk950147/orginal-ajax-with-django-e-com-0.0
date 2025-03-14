@@ -47,11 +47,11 @@ class VariantsAdmin(ModelAdmin):
 admin.site.register(Variants, VariantsAdmin)
 
 class ImagesAdmin(ModelAdmin):
-    list_display = ['id', 'product', 'title', 'image_tag', 'created_date', 'updated_date']
-    list_editable = ['title']
-    search_fields = ['title']
+    list_display = ['id', 'product', 'image_tag', 'created_date', 'updated_date']
+    list_editable = ['product']
+    search_fields = ['product']
     list_filter = ['product', 'created_date', 'updated_date']
-    readonly_fields = ['id', 'product', 'title', 'image_tag', 'created_date', 'updated_date']
+    readonly_fields = ['id', 'product', 'image_tag', 'created_date', 'updated_date']
 
 admin.site.register(Images, ImagesAdmin)
 
@@ -92,17 +92,18 @@ class SliderAdmin(ModelAdmin):
 admin.site.register(Slider, SliderAdmin)
 
 class BannerAdmin(ModelAdmin):
-    list_display = ['id', 'product', 'title', 'image_tag', 'side_deals', 'new_side', 'status', 'created_date', 'updated_date']
-    list_editable = ['side_deals', 'new_side', 'status']
+    list_display = ['id', 'product', 'title', 'image_tag', 'side_deals', 'side_deals_is_active', 'status', 'created_date', 'updated_date']
+    list_editable = ['side_deals', 'side_deals_is_active', 'status']
     search_fields = ['title']
-    list_filter = ['product', 'side_deals', 'new_side', 'status', 'created_date', 'updated_date']
+    list_filter = ['product', 'side_deals', 'side_deals_is_active', 'status', 'created_date', 'updated_date']
     readonly_fields = ['id', 'image_tag', 'created_date', 'updated_date']
 admin.site.register(Banner, BannerAdmin)
 
+
 class FutureAdmin(ModelAdmin):
-    list_display = ['id', 'product', 'title', 'hard_disk', 'cpu', 'ram', 'os', 'special_feature',  'ghaphic',  'status', 'created_date', 'updated_date']
+    list_display = ['id', 'product', 'title', 'hard_disk', 'cpu', 'ram', 'os', 'special_feature',  'graphic',  'status', 'created_date', 'updated_date']
     readonly_fields = ['id', 'created_date', 'updated_date']
-    search_fields = ['title', 'hard_disk', 'cpu', 'ram', 'os', 'special_feature',  'ghaphic']
+    search_fields = ['title', 'hard_disk', 'cpu', 'ram', 'os', 'special_feature',  'graphic']
     list_filter = ['product', 'status', 'created_date', 'updated_date']
 admin.site.register(Future, FutureAdmin)
 
