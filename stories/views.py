@@ -23,7 +23,7 @@ class HomeView(generic.View):
         context = {
             'sliders': Slider.objects.filter(status=True).order_by('id'),
             'banners': Banner.objects.filter(status=True).order_by('id')[:3],
-            'side_deals_banners': Banner.objects.filter(status=True, side_deals=True, new_side_is_active=True).order_by('id')[:1],
+            'side_deals_banners': Banner.objects.filter(status=True, side_deals=True, side_deals_is_active=True).order_by('id')[:1],
             'deals_products': Product.objects.filter(offers_deadline__isnull=False,  is_timeline=True, deals=True, status=True).order_by("id")[:6],
             'current_time': timezone.now(),
             'new_collections': Product.objects.filter(status=True, new_collection=True).order_by('id')[:4], 
@@ -33,7 +33,6 @@ class HomeView(generic.View):
             'pick_collections': Product.objects.filter(status=True, pick_collection=True).order_by('id')[:4],  
         }
         return render(request, 'stories/home.html', context)
-
 
 def SingleProductView(request, id):
     # Retrieve the product by id or return a 404 error if not found
@@ -85,7 +84,6 @@ def SingleProductView(request, id):
 
     return render(request, 'stories/single.html', context)
 
-
 def ajax_variant_select_sizes(request):
     """ Updates the color options when Size is changed """
     if request.method == 'POST':
@@ -115,8 +113,6 @@ def ajax_variant_select_sizes(request):
             })
 
     return JsonResponse({'messages': 'Invalid request'})
-
-
 
 @method_decorator(never_cache, name='dispatch')
 class ReviewsView(LoginRequiredMixin, generic.View):

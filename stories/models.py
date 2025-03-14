@@ -7,6 +7,7 @@ import uuid
 from django.utils import timezone
 from django.shortcuts import get_object_or_404
 from django.db.models import F, Avg, Count
+from decimal import Decimal
 User = get_user_model()
 
 
@@ -66,8 +67,8 @@ class Product(models.Model):
     model = models.CharField(max_length=150, null=True, blank=True)
     available_in_stock_msg = models.CharField(max_length=150, null=True, blank=True)
     in_stock_max = models.PositiveIntegerField(default=1)
-    price = models.PositiveIntegerField(default=0)
-    old_price = models.PositiveIntegerField(default=0)
+    price = models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
+    old_price =  models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     discount_title = models.CharField(max_length=150, null=True, blank=True)
     discount = models.PositiveIntegerField(default=0)
     # Time of the off_time field
@@ -173,7 +174,7 @@ class Variants(models.Model):
     size = models.ForeignKey(Size, on_delete=models.CASCADE, blank=True, null=True)
     image_id = models.PositiveIntegerField(blank=True, null=True, default=0)
     quantity = models.PositiveIntegerField(default=1)
-    price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
+    price =  models.DecimalField(max_digits=10, decimal_places=2, default=Decimal('0.00'))
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
 
