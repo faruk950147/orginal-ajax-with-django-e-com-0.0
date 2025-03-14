@@ -43,12 +43,12 @@
 							{% endif %}
 							</h3>
 							<div class="product-rating ">
-								<i class="fa fa-star{% if related_product.avaregereview < 1%}-o empty{% endif%}"></i>
-								<i class="fa fa-star{% if related_product.avaregereview < 2%}-o empty{% endif%}"></i>
-								<i class="fa fa-star{% if related_product.avaregereview < 3%}-o empty{% endif%}"></i>
-								<i class="fa fa-star{% if related_product.avaregereview < 4%}-o empty{% endif%}"></i>
-								<i class="fa fa-star{% if related_product.avaregereview < 5%}-o empty{% endif%}"></i>
-								{{ related_product.avaregereview |stringformat:".2f"}}
+								<i class="fa fa-star{% if related_product.average_review < 1%}-o empty{% endif%}"></i>
+								<i class="fa fa-star{% if related_product.average_review < 2%}-o empty{% endif%}"></i>
+								<i class="fa fa-star{% if related_product.average_review < 3%}-o empty{% endif%}"></i>
+								<i class="fa fa-star{% if related_product.average_review < 4%}-o empty{% endif%}"></i>
+								<i class="fa fa-star{% if related_product.average_review < 5%}-o empty{% endif%}"></i>
+								{{ related_product.average_review |stringformat:".2f"}}
 							</div>
 							
 							<h2 class="product-name"><a href="{% url "singleproductview" related_product.id %}">{{related_product.title|title}}</a></h2>

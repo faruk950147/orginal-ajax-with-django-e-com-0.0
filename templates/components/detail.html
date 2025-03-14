@@ -69,14 +69,14 @@
 							<h2 class="product-name">{{product.title|title}}</h2>
 							<div>
 							<div class="product-rating reviews_total_avg">
-                                <i class="fa fa-star{% if product.avaregereview < 1%}-o empty{% endif%}"></i>
-                                <i class="fa fa-star{% if product.avaregereview < 2%}-o empty{% endif%}"></i>
-                                <i class="fa fa-star{% if product.avaregereview < 3%}-o empty{% endif%}"></i>
-                                <i class="fa fa-star{% if product.avaregereview < 4%}-o empty{% endif%}"></i>
-                                <i class="fa fa-star{% if product.avaregereview < 5%}-o empty{% endif%}"></i>
-                                {{ product.avaregereview |stringformat:".2f"}}
+                                <i class="fa fa-star{% if product.average_review < 1%}-o empty{% endif%}"></i>
+                                <i class="fa fa-star{% if product.average_review < 2%}-o empty{% endif%}"></i>
+                                <i class="fa fa-star{% if product.average_review < 3%}-o empty{% endif%}"></i>
+                                <i class="fa fa-star{% if product.average_review < 4%}-o empty{% endif%}"></i>
+                                <i class="fa fa-star{% if product.average_review < 5%}-o empty{% endif%}"></i>
+                                {{ product.average_review |stringformat:".2f"}}
                             </div>
-							<a class="review_count"  data-toggle="tab" href="#tab4">{{ product.countreview}}  Review(s) / Add Review</a>
+							<a class="review_count"  data-toggle="tab" href="#tab4">{{ product.count_review}}  Review(s) / Add Review</a>
 							</div>
 							{% if product.in_stock and product.in_stock_max >= 1 %}
 							<p><strong>Availability:</strong> {{product.available_in_stock_msg}}</p>
