@@ -122,7 +122,6 @@
 												</div>
 											</form>
 										</div>
-										<br>
 									{% elif product.variant == 'Sizes' %}
 									<!--action="?q=selectvariant"-->
 										<form method="post" id="post-color">
@@ -141,8 +140,7 @@
 								
 												</ul>
 											</div>
-										</form>	
-										<br>				
+										</form>				
 									{% elif product.variant == 'Colors' %}
 									<!--action="?q=selectvariant"-->
 										<form method="post" id="post-color">
@@ -165,9 +163,8 @@
 										</form>
 									{% endif %}
 								</div>
-								<br>
 								{% if product.variant != 'None' %}
-									<form action="{% url 'addtocart' product.id %}" method="post" id="addchart-form">
+									<form action="{% url 'addtocart' product.id %}" method="post" id="addToChartForm">
 										<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 										<input type="hidden" name="variantid" id="variantid" value="{{ variant.id }}">
 										<p id="selected-size">Selected Size: {{ variant.size.title }} </p>
@@ -193,7 +190,7 @@
 										</div>
 									</form>
 								{% else %}
-									<form action="{% url 'addtocart' product.id %}" method="post" id="addchart-form">
+									<form action="{% url 'addtocart' product.id %}" method="post" id="addToChartForm">
 										<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
 										<h3 class="product-price">
 											$ {{ product.price }}
@@ -215,8 +212,6 @@
 								{% endif %}
 							</div>
 							
-    
-
 							<div class="pull-right">
 								<button class="main-btn icon-btn"><i class="fa fa-heart"></i></button>
 								<button class="main-btn icon-btn"><i class="fa fa-exchange"></i></button>
