@@ -52,9 +52,17 @@
 							<input class="input search-input" type="text" placeholder="Enter your keyword">
 							<select class="input search-categories">
 								<option value="0">All Categories</option>
-								{% for cat in cats %}
-								<option value="{{cat.id}}">{{cat.title|title}}</option>
-								{% endfor %}
+								{% if request.user.is_authenticated %}
+									{% if cats %}
+										{% for cat in cats %}
+											<option value="{{cat.id}}">{{cat.title|title}}</option>
+										{% endfor %}
+									{% else %}
+										<option value="0">No Categories</option>
+									{% endif %}
+								{% else %}
+									<option value="0">You are not authenticated</option>
+								{% endif %}
 							</select>
 							<button class="search-btn"><i class="fa fa-search"></i></button>
 						</form>
@@ -67,11 +75,11 @@
 						<li class="header-account dropdown default-dropdown">
 							<div class="dropdown-toggle" role="button" data-toggle="dropdown" aria-expanded="true">
 								<div class="header-btns-icon" style="width: 45px;">
-									{% if request.user.profiles.image %}
-									<img src="{{request.user.profiles.image.url}}" alt="" style="width: 100%;">
+									{% if request.user.is_authenticated and request.user.profiles.image %}
+										<img src="{{request.user.profiles.image.url}}" alt="" style="width: 100%;">
 									{% else %}
-									<img src="{% static "img/user.png" %}" alt="{{request.user.username}}"
-									class="rounded-circle img-fluid shadow-lg" style="width: 30px;">
+										<img src="{% static "img/user.png" %}" alt="{{request.user.username}}"
+											class="rounded-circle img-fluid shadow-lg" style="width: 30px;">
 									{% endif %}
 								</div>
 								<strong class="text-uppercase">My Account <i class="fa fa-caret-down"></i></strong>
@@ -84,15 +92,15 @@
 
 							<ul class="custom-menu">
 								{% if request.user.is_authenticated %}
-								<li><a href="#"><i class="fa fa-user-o"></i> My Account</a></li>
-								<li><a href="#"><i class="fa fa-heart-o"></i> My Wishlist</a></li>
-								<li><a href="{% url "profileview" %}"><i class="fa fa-id-card"></i> Profile View</a></li>
-								<li><a href="{% url "changespassword" %}"><i class="fa fa-pen-to-square"></i> Changes Password</a></li>
+								<li><a href="#"><i class="fa-solid fa-user"></i> My Account</a></li>
+								<li><a href="#"><i class="fa-solid fa-heart"></i> My Wishlist</a></li>
+								<li><a href="{% url "profileview" %}"><i class="fa-solid fa-id-card"></i> Profile View</a></li>
+								<li><a href="{% url "changespassword" %}"><i class="fa-solid fa-pen-to-square"></i> Changes Password</a></li>
 
 								<li><a href="{% url "signout" %}"><i class="fa-brands fa-creative-commons"></i> Sign Out</a></li>
 								{% else %}
-								<li><a href="{% url "sign" %}"><i class="fa fa-florin-sign"></i> Sign In</a></li>
-								<li><a href="{% url "signup" %}"><i class="fa fa-user"></i> Sign Up</a></li>
+								<li><a href="{% url "sign" %}"><i class="fa-solid fa-florin-sign"></i> Sign In</a></li>
+								<li><a href="{% url "signup" %}"><i class="fa-solid fa-user"></i> Sign Up</a></li>
 								{% endif %}
 							</ul>
 						</li>
@@ -130,7 +138,7 @@
 										{% endfor %}
 									</div>
 									<div class="shopping-cart-btns">
-										<a href="{% url "cartview" %}" class="main-btn">View Cart <i class="fa fa-arrow-circle-right"></i></a>
+										<a href="" class="main-btn">View Cart <i class="fa fa-arrow-circle-right"></i></a>
 										<a href="" class="main-btn">Checkout <i class="fa fa-arrow-circle-right"></i></a>
 									</div>
 								</div>

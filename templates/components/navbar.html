@@ -21,9 +21,11 @@
 													<div class="col-md-4">
 														<ul class="list-links">
 															<li><h3 class="list-links-title">Categories</h3></li>
-															{% for subcategory in category.children.all %}
-																<li><a href="#">{{subcategory.title|title}}</a></li>
-															{% endfor %}	
+															{% if category.children.all %}
+																{% for subcategory in category.children.all %}
+																	<li><a href="#">{{subcategory.title|title}}</a></li>
+																{% endfor %}	
+															{% endif %}
 														</ul>
 														<hr class="hidden-md hidden-lg">
 													</div>
